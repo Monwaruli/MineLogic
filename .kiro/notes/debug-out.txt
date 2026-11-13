@@ -1,0 +1,102 @@
+
+> minelogic-platform@0.1.0 test
+> vitest run debug-solver
+
+
+ RUN  v2.1.9 C:/Users/ItsEc/OneDrive/Desktop/MineMentor
+
+stdout | src/engine/debug-solver.test.ts > debug > soundness
+
+=== soundness === inconsistent=false inexact=false
+    0,0: solver=Undetermined brute=Undetermined
+    0,1: solver=Undetermined brute=Undetermined
+    0,2: solver=Undetermined brute=Undetermined
+    0,3: solver=Undetermined brute=Undetermined
+    1,0: solver=Undetermined brute=Undetermined
+    1,1: solver=Undetermined brute=Undetermined
+    1,3: solver=Undetermined brute=Undetermined
+    2,0: solver=Undetermined brute=Undetermined
+    2,1: solver=Undetermined brute=Undetermined
+    2,3: solver=Undetermined brute=Undetermined
+    3,0: solver=Undetermined brute=Undetermined
+    3,1: solver=Undetermined brute=Undetermined
+    3,2: solver=Undetermined brute=Undetermined
+    3,3: solver=Undetermined brute=Undetermined
+
+stdout | src/engine/debug-solver.test.ts > debug > brute
+
+=== brute === inconsistent=false inexact=false
+    0,0: solver=Undetermined brute=Undetermined
+    0,1: solver=Undetermined brute=Undetermined
+    0,2: solver=Undetermined brute=Undetermined
+    0,3: solver=Undetermined brute=Undetermined
+    1,1: solver=Undetermined brute=Undetermined
+    1,2: solver=Undetermined brute=Undetermined
+    1,3: solver=Undetermined brute=Undetermined
+    2,0: solver=Undetermined brute=Undetermined
+    2,1: solver=Undetermined brute=Undetermined
+    2,3: solver=Undetermined brute=Undetermined
+    3,0: solver=Undetermined brute=Undetermined
+    3,1: solver=Undetermined brute=Undetermined
+    3,2: solver=Undetermined brute=Undetermined
+    4,0: solver=Undetermined brute=Undetermined
+    4,2: solver=Undetermined brute=Undetermined
+    4,3: solver=Undetermined brute=Undetermined
+
+stdout | src/engine/debug-solver.test.ts > debug > flags
+TRACE {
+  "forced": [],
+  "unconstrainedCount": 12,
+  "remainingMines": 3,
+  "prof": [
+    {
+      "vars": [
+        "0,0",
+        "1,0",
+        "1,1",
+        "1,2",
+        "0,3",
+        "1,3"
+      ],
+      "counts": [
+        1,
+        2
+      ],
+      "reach": [
+        1,
+        2
+      ]
+    }
+  ],
+  "ucm": true,
+  "ucs": true
+}
+
+=== flags === inconsistent=false inexact=false
+    0,0: solver=Undetermined brute=Undetermined
+    0,3: solver=Undetermined brute=Undetermined
+    1,0: solver=Undetermined brute=Undetermined
+    1,1: solver=Undetermined brute=Undetermined
+    1,2: solver=Undetermined brute=Undetermined
+    1,3: solver=Undetermined brute=Undetermined
+    2,0: solver=Undetermined brute=Undetermined
+    2,1: solver=Undetermined brute=Undetermined
+    2,2: solver=Undetermined brute=Undetermined
+    2,3: solver=Undetermined brute=Undetermined
+    3,0: solver=Undetermined brute=Undetermined
+    3,1: solver=Undetermined brute=Undetermined
+    3,2: solver=Undetermined brute=Undetermined
+    3,3: solver=Undetermined brute=Undetermined
+    4,0: solver=Undetermined brute=Undetermined
+    4,1: solver=Undetermined brute=Undetermined
+    4,2: solver=Undetermined brute=Undetermined
+    4,3: solver=Undetermined brute=Undetermined
+
+ G£ô src/engine/debug-solver.test.ts (3 tests) 5ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  01:38:05
+   Duration  471ms (transform 47ms, setup 0ms, collect 55ms, tests 5ms, environment 0ms, prepare 172ms)
+
+

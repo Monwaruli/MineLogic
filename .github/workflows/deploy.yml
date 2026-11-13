@@ -1,0 +1,96 @@
+﻿# MineLogic — build, verify, and deploy to GitHub Pages (Requirement 28.1).
+#
+# On every push to main this workflow runs the type check, the test suite, and
+# the content validation, builds the static client, and — only when every step
+# passes — deploys it to GitHub Pages. The Supabase URL and anon key are read
+# from repository secrets (Requirement 27.10); they are the ONLY Backend
+# credentials in the bundle (27.8). A guard fails the build if a service-role
+# key ever leaks into the output (27.9).
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permissions the Pages deploy needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a newer run supersede an in-flight one, but never cancel a live deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
+      - name: Validate content
+        run: npm run validate:content
+
+      - name: Build
+        env:
+          # Public Backend credentials from repo secrets (27.10, 27.8). If unset,
+          # the client still builds and runs guest-only (offline) mode.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      - name: Guard against a leaked service-role key (27.9)
+        # A Supabase service_role JWT carries the claim "role":"service_role",
+        # which base64-encodes to this marker. Fail the build if it appears
+        # anywhere in the built bundle.
+        run: |
+          if grep -rqF 'cm9sZSI6InNlcnZpY2Vfcm9sZQ' dist 2>/dev/null; then
+            echo "::error::A service_role key appears in the build output. Aborting."
+            exit 1
+          fi
+          if grep -rq 'service_role' dist 2>/dev/null; then
+            echo "::error::The string service_role appears in the build output. Aborting."
+            exit 1
+          fi
+          echo "No service-role key found in the bundle."
+
+      - name: SPA fallback for deep links and Study_Links (28.3)
+        # GitHub Pages serves 404.html for unknown paths. Copying index.html to
+        # 404.html makes a direct visit to any URL (including a ?study= link)
+        # load the app instead of a 404.
+        run: cp dist/index.html dist/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

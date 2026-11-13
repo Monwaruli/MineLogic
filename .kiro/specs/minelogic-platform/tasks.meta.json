@@ -1,0 +1,265 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Set up the project and build the board engine": [
+      {
+        "executionId": "048a2e38-b0a8-4e67-b543-2f8764e77feb",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793417928532
+      },
+      {
+        "executionId": "9b7eb062-7aaf-4d46-aa1a-1f7371dce308",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793417979407
+      },
+      {
+        "executionId": "9b7eb062-7aaf-4d46-aa1a-1f7371dce308",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793418227086
+      },
+      {
+        "executionId": "41bd6250-4473-4e20-bdbb-0bd25cb462b7",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793420021800
+      },
+      {
+        "executionId": "41bd6250-4473-4e20-bdbb-0bd25cb462b7",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793424333730
+      }
+    ],
+    "2. Build the constraint satisfaction Solver": [
+      {
+        "executionId": "f540d54b-6a25-4249-8d7f-819e80201bb2",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793418320103
+      },
+      {
+        "executionId": "47d2fd16-6781-4c3a-8ae7-ddec823774ab",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793419019686
+      },
+      {
+        "executionId": "41bd6250-4473-4e20-bdbb-0bd25cb462b7",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793424360969
+      },
+      {
+        "executionId": "0fef86ce-7133-4da0-8be9-9713fa0ca143",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793425908760
+      },
+      {
+        "executionId": "0fef86ce-7133-4da0-8be9-9713fa0ca143",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793429287778
+      }
+    ],
+    "3. Build the no-guess Board_Generator": [
+      {
+        "executionId": "0fef86ce-7133-4da0-8be9-9713fa0ca143",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793429290858
+      },
+      {
+        "executionId": "0fef86ce-7133-4da0-8be9-9713fa0ca143",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793429939744
+      }
+    ],
+    "4.1 Build the Move_Log format and the Metrics_Engine": [
+      {
+        "executionId": "0fef86ce-7133-4da0-8be9-9713fa0ca143",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793429947418
+      },
+      {
+        "executionId": "8d24b3ff-4e1a-407e-a515-cb2ed78ccf5e",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793430200668
+      },
+      {
+        "executionId": "8d24b3ff-4e1a-407e-a515-cb2ed78ccf5e",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793430383649
+      }
+    ],
+    "4.2 Build the board view and the timed game screens": [
+      {
+        "executionId": "8d24b3ff-4e1a-407e-a515-cb2ed78ccf5e",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793430386617
+      },
+      {
+        "executionId": "6649806a-7025-40dd-b0a8-6ab685d18152",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793430972859
+      },
+      {
+        "executionId": "6649806a-7025-40dd-b0a8-6ab685d18152",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793431971429
+      }
+    ],
+    "4. Make timed no-guess games playable, with metrics": [
+      {
+        "executionId": "6649806a-7025-40dd-b0a8-6ab685d18152",
+        "chatSessionId": "sess_572449b0-254b-4ef6-93b5-b46ed2f39634",
+        "timestamp": 1793431971488
+      }
+    ],
+    "5. Add Follow-Along Practice with the two-stage Nudge": [
+      {
+        "executionId": "bd2785ef-4be7-4733-88a4-abe26d56c5f8",
+        "chatSessionId": "sess_5f79591e-85bb-42cf-821b-1f90728d7ce6",
+        "timestamp": 1793478360580
+      },
+      {
+        "executionId": "bd2785ef-4be7-4733-88a4-abe26d56c5f8",
+        "chatSessionId": "sess_5f79591e-85bb-42cf-821b-1f90728d7ce6",
+        "timestamp": 1793479772112
+      }
+    ],
+    "6. Add pattern detection, Pattern Recognition Speed, and the post-game replay": [
+      {
+        "executionId": "88fde0ca-4f0d-4ba1-b23f-d16a29db3e1b",
+        "chatSessionId": "sess_9d88540d-56e2-46aa-b60a-140b420a18a0",
+        "timestamp": 1793480384191
+      },
+      {
+        "executionId": "88fde0ca-4f0d-4ba1-b23f-d16a29db3e1b",
+        "chatSessionId": "sess_9d88540d-56e2-46aa-b60a-140b420a18a0",
+        "timestamp": 1793481777350
+      }
+    ],
+    "7.1 Build the Tutorial_Player and the lesson content": [
+      {
+        "executionId": "b7421ccd-1ede-4865-961f-ea0219c51303",
+        "chatSessionId": "sess_b55a3855-33cd-4ff6-94f1-df60a5ab44d9",
+        "timestamp": 1793481885912
+      },
+      {
+        "executionId": "5dbad160-1462-439a-a667-d3024a11188e",
+        "chatSessionId": "sess_3665c3c6-e5d8-4cd7-b7ae-262879c0d8cc",
+        "timestamp": 1793575256577
+      },
+      {
+        "executionId": "5dbad160-1462-439a-a667-d3024a11188e",
+        "chatSessionId": "sess_3665c3c6-e5d8-4cd7-b7ae-262879c0d8cc",
+        "timestamp": 1793577253059
+      }
+    ],
+    "7.2 Add Mastery_Checkpoints and the Video_Panel": [
+      {
+        "executionId": "5dbad160-1462-439a-a667-d3024a11188e",
+        "chatSessionId": "sess_3665c3c6-e5d8-4cd7-b7ae-262879c0d8cc",
+        "timestamp": 1793577255671
+      },
+      {
+        "executionId": "5dbad160-1462-439a-a667-d3024a11188e",
+        "chatSessionId": "sess_3665c3c6-e5d8-4cd7-b7ae-262879c0d8cc",
+        "timestamp": 1793578271986
+      }
+    ],
+    "7.3 Add onboarding, the Hub, and the Content_Validator": [
+      {
+        "executionId": "5dbad160-1462-439a-a667-d3024a11188e",
+        "chatSessionId": "sess_3665c3c6-e5d8-4cd7-b7ae-262879c0d8cc",
+        "timestamp": 1793578278954
+      },
+      {
+        "executionId": "5dbad160-1462-439a-a667-d3024a11188e",
+        "chatSessionId": "sess_3665c3c6-e5d8-4cd7-b7ae-262879c0d8cc",
+        "timestamp": 1793580115110
+      }
+    ],
+    "7. Add tutorials, mastery checkpoints, videos, and onboarding": [
+      {
+        "executionId": "5dbad160-1462-439a-a667-d3024a11188e",
+        "chatSessionId": "sess_3665c3c6-e5d8-4cd7-b7ae-262879c0d8cc",
+        "timestamp": 1793580115193
+      }
+    ],
+    "8.1 Create the schema and Row Level Security": [
+      {
+        "executionId": "1cee55c9-89b3-4d47-9816-7ad9ce50b76d",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1793581213417
+      },
+      {
+        "executionId": "1cee55c9-89b3-4d47-9816-7ad9ce50b76d",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1793581551565
+      }
+    ],
+    "8.2 Add accounts and progress sync": [
+      {
+        "executionId": "1cee55c9-89b3-4d47-9816-7ad9ce50b76d",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1793581562841
+      },
+      {
+        "executionId": "1cee55c9-89b3-4d47-9816-7ad9ce50b76d",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1793582006245
+      }
+    ],
+    "8.3 Add leaderboards and the Daily Sweep": [
+      {
+        "executionId": "1cee55c9-89b3-4d47-9816-7ad9ce50b76d",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1793582015975
+      },
+      {
+        "executionId": "1cee55c9-89b3-4d47-9816-7ad9ce50b76d",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1793582576365
+      }
+    ],
+    "8. Add the Supabase backend": [
+      {
+        "executionId": "1cee55c9-89b3-4d47-9816-7ad9ce50b76d",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1793582576452
+      }
+    ],
+    "9.1 Add study entry, consent, and participant identity": [
+      {
+        "executionId": "f94db81f-38ec-4086-886a-e77d6f2d0d28",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1794525850078
+      },
+      {
+        "executionId": "f94db81f-38ec-4086-886a-e77d6f2d0d28",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1794526643074
+      }
+    ],
+    "9.2 Add the pre-test, the learning phase, and the post-test": [
+      {
+        "executionId": "f94db81f-38ec-4086-886a-e77d6f2d0d28",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1794526658619
+      },
+      {
+        "executionId": "f94db81f-38ec-4086-886a-e77d6f2d0d28",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1794530322609
+      }
+    ],
+    "9.3 Add the survey, study logging, and data export": [
+      {
+        "executionId": "f94db81f-38ec-4086-886a-e77d6f2d0d28",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1794530335887
+      }
+    ],
+    "9. Add the evaluation study module": [
+      {
+        "executionId": "86ba881c-fcfc-41ef-8beb-5e1eb0b2cf29",
+        "chatSessionId": "sess_fea51cc4-bdfc-482a-82a7-6d10948631c4",
+        "timestamp": 1794540470025
+      }
+    ]
+  }
+}
