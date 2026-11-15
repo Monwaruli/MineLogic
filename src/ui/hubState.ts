@@ -41,19 +41,25 @@ import {
   loadOnboarding,
   type StorageLike as OnboardingStorage,
 } from '../storage/onboardingStorage';
+import {
+  loadCompletedSweepDays,
+  type StorageLike as SweepStorage,
+} from '../storage/sweepStorage';
+import { currentStreak, longestStreak, sweepDayOf } from '../engine/streak';
 
 /** A single Storage surface used for every read (window.localStorage in the app). */
 export type HubStorage = LessonStorage &
   CheckpointStorage &
   PracticeStorage &
   GameStorage &
-  OnboardingStorage;
+  OnboardingStorage &
+  SweepStorage;
 
 /** The data the Hub renders. */
 export interface HubState {
   statuses: Record<Tier, TierStatus>;
   recommendation: Recommendation | null;
-  /** The longest/daily streaks are placeholders until task 8 adds the backend. */
+  /** Current and longest Daily_Streak from the local completed-Sweep_Days set. */
   dailyStreak: number;
   longestStreak: number;
 }
@@ -91,7 +97,10 @@ export function milestonesForTier(
 }
 
 /** Build the full Hub state from storage (Requirement 17.4-17.6). */
-export function buildHubState(storage?: HubStorage): HubState {
+export function buildHubState(
+  storage?: HubStorage,
+  now: () => number = Date.now,
+): HubState {
   const milestones = {} as Record<Tier, TierMilestones>;
   const statuses = {} as Record<Tier, TierStatus>;
   for (const tier of TIERS) {
@@ -99,12 +108,14 @@ export function buildHubState(storage?: HubStorage): HubState {
     milestones[tier] = m;
     statuses[tier] = tierStatus(tier, m);
   }
+  // Daily_Streak (18.8) and longest streak (18.9) from the device's completed
+  // Sweep_Days. Local-only for now; computed purely from the stored day set.
+  const completedDays = loadCompletedSweepDays(storage);
+  const today = sweepDayOf(now());
   return {
     statuses,
     recommendation: recommendation(milestones),
-    // Daily/longest streaks come from the backend (task 8); until then they are
-    // zero, which Requirement 17.4 still asks the Hub to display.
-    dailyStreak: 0,
-    longestStreak: 0,
+    dailyStreak: currentStreak(completedDays, today),
+    longestStreak: longestStreak(completedDays),
   };
 }

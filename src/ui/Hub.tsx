@@ -29,6 +29,8 @@ export interface HubProps {
   onOpen: (tier: Tier, step: HubLoopStep) => void;
   /** Open the leaderboards (17.4). A placeholder until task 8.3. */
   onOpenLeaderboards?: () => void;
+  /** Open today's Daily_Sweep board (Requirement 18.1). */
+  onOpenDailySweep?: () => void;
   /** Storage for milestone reads; defaults to window.localStorage. */
   storage?: HubStorage;
   /** Bump to force a recompute after returning from a step. */
@@ -99,6 +101,7 @@ function MasteryBar({ value }: { value: number }) {
 export default function Hub({
   onOpen,
   onOpenLeaderboards,
+  onOpenDailySweep,
   storage,
   refreshKey = 0,
   session = null,
@@ -176,6 +179,15 @@ export default function Hub({
         <span data-testid="longest-streak">
           Longest streak: <strong>{state.longestStreak}</strong>
         </span>
+        <button
+          type="button"
+          onClick={onOpenDailySweep}
+          disabled={!onOpenDailySweep}
+          data-testid="open-daily-sweep"
+          className="underline text-amber-300 hover:text-amber-200 disabled:text-slate-500 disabled:no-underline focus:outline-none focus:ring-2 focus:ring-amber-400 rounded px-1"
+        >
+          Daily Sweep
+        </button>
         <button
           type="button"
           onClick={onOpenLeaderboards}

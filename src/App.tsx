@@ -37,6 +37,9 @@ import { getSupabaseClient, isSupabaseConfigured } from './storage/supabaseClien
 import type { WonGame } from './ui/GameScreen';
 import { getSession, signOut as signOutSvc, type AuthSession } from './storage/authService';
 import { currentStudyCode } from './study/studyLink';
+import { sweepDayHash } from './engine/dailySweep';
+import { sweepDayOf } from './engine/streak';
+import { recordSweepCompletion } from './storage/sweepStorage';
 
 type Route =
   | { screen: 'onboarding' }
@@ -46,7 +49,8 @@ type Route =
   | { screen: 'tutorial'; tier: Tier; lessonId: string }
   | { screen: 'checkpoint'; tier: Tier }
   | { screen: 'practice'; difficulty: Difficulty; seed: number; epoch: number }
-  | { screen: 'game'; difficulty: Difficulty; seed: number; epoch: number };
+  | { screen: 'game'; difficulty: Difficulty; seed: number; epoch: number }
+  | { screen: 'dailysweep'; seed: number; epoch: number };
 
 /** A fresh seed for a new board. Uses the clock so each game differs. */
 function freshSeed(): number {
@@ -184,11 +188,31 @@ export default function App() {
     }
   }, []);
 
+  // Open today's Daily_Sweep: the SAME Intermediate board for everyone all day
+  // (18.1), its seed derived deterministically from today's Sweep_Day so the
+  // layout is stable across the day and across players.
+  const openDailySweep = useCallback(() => {
+    const seed = sweepDayHash(sweepDayOf(Date.now()));
+    setRoute({ screen: 'dailysweep', seed, epoch: 0 });
+  }, []);
+
+  // On a Daily_Sweep win: record today's Sweep_Day locally so the Daily_Streak
+  // (18.7-18.9) advances, then also submit to the leaderboard when signed in.
+  const onWinSweep = useCallback(
+    async (won: WonGame): Promise<SubmitResult | null> => {
+      recordSweepCompletion(sweepDayOf(Date.now()));
+      return submitWin(won);
+    },
+    [submitWin],
+  );
+
   const playAgain = useCallback(() => {
     setRoute((r) =>
       r.screen === 'game' || r.screen === 'practice'
         ? { ...r, seed: freshSeed(), epoch: 0 }
-        : r,
+        : r.screen === 'dailysweep'
+          ? { ...r, epoch: r.epoch + 1 }
+          : r,
     );
   }, []);
 
@@ -196,7 +220,7 @@ export default function App() {
   // re-mounts with a fresh game state on the identical layout.
   const restartBoard = useCallback(() => {
     setRoute((r) =>
-      r.screen === 'game' || r.screen === 'practice'
+      r.screen === 'game' || r.screen === 'practice' || r.screen === 'dailysweep'
         ? { ...r, epoch: r.epoch + 1 }
         : r,
     );
@@ -248,6 +272,7 @@ export default function App() {
           onSignIn={openAuth}
           onSignOut={handleSignOut}
           onOpenLeaderboards={openLeaderboards}
+          onOpenDailySweep={openDailySweep}
         />
       )}
 
@@ -285,6 +310,22 @@ export default function App() {
           onRestart={restartBoard}
           onWin={submitWin}
         />
+      )}
+
+      {route.screen === 'dailysweep' && (
+        <div className="flex flex-col items-center gap-3 w-full">
+          <h2 className="text-xl font-semibold text-amber-300">Daily Sweep</h2>
+          <p className="text-sm text-slate-400">Today's board is the same for everyone. Clear it to extend your streak.</p>
+          <GameScreen
+            key={`sweep-${route.seed}-${route.epoch}`}
+            difficulty={DIFFICULTIES.Intermediate}
+            seed={route.seed}
+            onHome={goHub}
+            onPlayAgain={playAgain}
+            onRestart={restartBoard}
+            onWin={onWinSweep}
+          />
+        </div>
       )}
     </main>
   );
