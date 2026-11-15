@@ -60,12 +60,16 @@ describe('CheckpointScreen (Requirement 13 + 12 layout)', () => {
     expect(markers.querySelectorAll('[data-testid="streak-filled"]')).toHaveLength(0);
   });
 
-  it('shows the Video_Panel beside the board, with the coming-soon placeholder (12.2, 12.5)', () => {
+  it('shows the Video_Panel beside the board, playing the tier walkthrough clip (12.1, 12.2)', () => {
     render(
       <CheckpointScreen tier="Beginner" seed={0} onHome={() => {}} storage={memoryStorage()} />,
     );
+    // The panel renders beside the board; with a walkthrough clip now configured
+    // per tier (src/content/videos.ts), it shows the native file player rather
+    // than the coming-soon placeholder.
     expect(screen.getByTestId('video-panel')).toBeTruthy();
-    expect(screen.getByTestId('video-placeholder').textContent).toMatch(/coming soon/i);
+    const video = screen.getByTestId('video-file');
+    expect(video.querySelector('source')?.getAttribute('src') || '').toContain('videos/beginner.webm');
   });
 
   it('a Slip flashes an error marker and resets the streak (13.3)', () => {
