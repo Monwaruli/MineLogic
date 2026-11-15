@@ -17,7 +17,7 @@
  * reflect freshly-recorded milestones.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DIFFICULTIES, type Difficulty } from './engine/board';
 import type { Tier } from './engine/progress';
 import { hasOnboarded } from './storage/onboardingStorage';
@@ -30,11 +30,14 @@ import CheckpointScreen from './ui/CheckpointScreen';
 import GameScreen from './ui/GameScreen';
 import PracticeScreen from './ui/PracticeScreen';
 import StudyModule from './study/StudyModule';
+import AuthScreen from './ui/AuthScreen';
+import { getSession, signOut as signOutSvc, type AuthSession } from './storage/authService';
 import { currentStudyCode } from './study/studyLink';
 
 type Route =
   | { screen: 'onboarding' }
   | { screen: 'hub' }
+  | { screen: 'auth' }
   | { screen: 'tutorial'; tier: Tier; lessonId: string }
   | { screen: 'checkpoint'; tier: Tier }
   | { screen: 'practice'; difficulty: Difficulty; seed: number; epoch: number }
@@ -65,6 +68,34 @@ export default function App() {
   );
   // Bumped whenever we return to the Hub, so it re-reads milestones.
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // The signed-in Account session, or null for a Guest. Initialized from the
+  // Supabase session on mount so a returning user is recognized; guests see
+  // the app immediately (this never blocks render).
+  const [session, setSession] = useState<AuthSession | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getSession().then((s) => { if (!cancelled) setSession(s); });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Open the auth screen (sign in / create account) from the Hub.
+  const openAuth = useCallback(() => setRoute({ screen: 'auth' }), []);
+
+  // After a successful sign in / sign up: record the session and return home.
+  // The guest->account progress merge (Requirement 20.6) runs in accountSync on
+  // first sign-in; it is guarded + idempotent. We keep it best-effort here and
+  // do not block the UI on it.
+  const onAuthed = useCallback((userId: string) => {
+    setSession({ userId });
+    setRefreshKey((k) => k + 1);
+    setRoute({ screen: 'hub' });
+  }, []);
+
+  // Sign out: clear the Supabase session and the local session state.
+  const handleSignOut = useCallback(() => {
+    void signOutSvc().finally(() => setSession(null));
+  }, []);
 
   const goHub = useCallback(() => {
     setRefreshKey((k) => k + 1);
@@ -152,8 +183,19 @@ export default function App() {
         <OnboardingFlow onComplete={finishOnboarding} />
       )}
 
+      {route.screen === 'auth' && (
+        <AuthScreen onAuthed={onAuthed} onCancel={goHub} />
+      )}
+
       {route.screen === 'hub' && (
-        <Hub key={`hub-${refreshKey}`} refreshKey={refreshKey} onOpen={openStep} />
+        <Hub
+          key={`hub-${refreshKey}`}
+          refreshKey={refreshKey}
+          onOpen={openStep}
+          session={session}
+          onSignIn={openAuth}
+          onSignOut={handleSignOut}
+        />
       )}
 
       {route.screen === 'tutorial' && (

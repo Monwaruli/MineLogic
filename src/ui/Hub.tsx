@@ -33,6 +33,12 @@ export interface HubProps {
   storage?: HubStorage;
   /** Bump to force a recompute after returning from a step. */
   refreshKey?: number;
+  /** The signed-in Account session, or null for a Guest. */
+  session?: { userId: string } | null;
+  /** Open the sign-in / create-account screen. */
+  onSignIn?: () => void;
+  /** Sign out the current Account. */
+  onSignOut?: () => void;
 }
 
 /** The Difficulty preset for a tier name. */
@@ -95,6 +101,9 @@ export default function Hub({
   onOpenLeaderboards,
   storage,
   refreshKey = 0,
+  session = null,
+  onSignIn,
+  onSignOut,
 }: HubProps) {
   const state = useMemo(
     () => buildHubState(storage),
@@ -130,6 +139,34 @@ export default function Hub({
       className="flex flex-col items-center gap-6 w-full max-w-3xl"
     >
       <h1 className="text-4xl font-bold tracking-tight">MineLogic</h1>
+
+      {/* Account area: sign in / create account when a Guest, or the signed-in
+          state with a sign out control. Accounts enable leaderboards. */}
+      <div className="flex items-center gap-3 text-sm" data-testid="account-area">
+        {session ? (
+          <>
+            <span className="text-slate-300" data-testid="account-signed-in">Signed in</span>
+            <button
+              type="button"
+              onClick={onSignOut}
+              data-testid="account-signout"
+              className="underline text-slate-400 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400 rounded px-1"
+            >
+              Sign out
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={onSignIn}
+            disabled={!onSignIn}
+            data-testid="account-signin"
+            className="px-3 py-1 rounded bg-sky-600 hover:bg-sky-500 text-white font-semibold disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-sky-300"
+          >
+            Sign in / Create account
+          </button>
+        )}
+      </div>
 
       {/* Streaks and leaderboards (Requirement 17.4). */}
       <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
