@@ -43,6 +43,8 @@ import StudyLearningPhase from './StudyLearningPhase';
 import SurveyForm from './SurveyForm';
 import { parseEvaluationBoard } from './studyTestGame';
 import { createStudyLogger, type StudyLogger, type BackgroundAnswers } from './studyLogger';
+import { makeStudyDeliver } from './studyLogger';
+import { flushQueue } from '../storage/syncQueue';
 import { BACKGROUND_QUESTION_IDS } from './csvExport';
 import type { Board } from '../engine/board';
 
@@ -145,6 +147,17 @@ export default function StudySession({
     [logger, participantId],
   );
 
+  // Deliver any enqueued Study_Records to the Backend through the Sync_Queue
+  // using the study-specific deliver (insert_study_record RPC, 25.10). The
+  // logger only ENQUEUES; without this flush the records would sit in local
+  // storage and never reach Supabase. Failures stay queued and retry on the
+  // next flush. Fire-and-forget: the UI does not block on delivery.
+  const flushStudy = useCallback(() => {
+    void flushQueue(makeStudyDeliver(), { storage }).catch(() => {
+      // Swallow: a failed delivery remains queued and retries on a later flush.
+    });
+  }, [storage]);
+
   const complete = useCallback(
     (done: StudyStep) => {
       // Mark the finished step complete in the LOCAL pointer so a same-browser
@@ -178,6 +191,7 @@ export default function StudySession({
           // 25.7 — store the Background_Question answers and the group (null
           // here; it is assigned later in the Intermediate block, 23.3).
           studyLogger.logBackground(answers, group);
+          flushStudy();
           complete('Background_Questions');
         }}
       />,
@@ -196,6 +210,7 @@ export default function StudySession({
         storage={storage}
         now={now}
         logger={studyLogger}
+        onFlush={flushStudy}
         onPhaseComplete={() => complete('Pre_Test')}
       />,
     );
@@ -228,6 +243,7 @@ export default function StudySession({
         storage={storage}
         now={now}
         logger={studyLogger}
+        onFlush={flushStudy}
         onPhaseComplete={() => complete('Post_Test')}
       />,
     );
@@ -244,6 +260,7 @@ export default function StudySession({
           // 24.6 — store every answer (unanswered items as blank) with the
           // Participant_ID (on every record), then show the completion screen.
           studyLogger.logSurvey(answers);
+          flushStudy();
           complete('Survey_Form');
         }}
       />,
@@ -345,6 +362,7 @@ function TestPhase({
   storage,
   now,
   logger,
+  onFlush,
   onPhaseComplete,
 }: {
   studyCode: string;
@@ -354,6 +372,7 @@ function TestPhase({
   storage?: StorageLike;
   now: () => number;
   logger: StudyLogger;
+  onFlush: () => void;
   onPhaseComplete: () => void;
 }) {
   const [index, setIndex] = useState(0);
@@ -398,6 +417,8 @@ function TestPhase({
           boardId: result.boardId,
           moveLog: result.moveLog,
         });
+        // Deliver the just-logged record to the Backend (25.10).
+        onFlush();
       }
       // Normal end: clear the marker (not an interruption).
       clearTestMarker(studyCode, storage);
@@ -407,7 +428,7 @@ function TestPhase({
         setIndex((i) => i + 1);
       }
     },
-    [studyCode, storage, index, games.length, onPhaseComplete, logger, step, current],
+    [studyCode, storage, index, games.length, onPhaseComplete, logger, step, current, onFlush],
   );
 
   const reminder = useMemo(() => (step === 'Pre_Test' ? CONTROLS_REMINDER : undefined), [step]);
