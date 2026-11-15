@@ -31,6 +31,7 @@ import GameScreen from './ui/GameScreen';
 import PracticeScreen from './ui/PracticeScreen';
 import StudyModule from './study/StudyModule';
 import AuthScreen from './ui/AuthScreen';
+import LeaderboardScreen from './ui/LeaderboardScreen';
 import { submitResult } from './storage/leaderboardService';
 import { getSupabaseClient, isSupabaseConfigured } from './storage/supabaseClient';
 import type { WonGame } from './ui/GameScreen';
@@ -41,6 +42,7 @@ type Route =
   | { screen: 'onboarding' }
   | { screen: 'hub' }
   | { screen: 'auth' }
+  | { screen: 'leaderboard' }
   | { screen: 'tutorial'; tier: Tier; lessonId: string }
   | { screen: 'checkpoint'; tier: Tier }
   | { screen: 'practice'; difficulty: Difficulty; seed: number; epoch: number }
@@ -84,6 +86,7 @@ export default function App() {
 
   // Open the auth screen (sign in / create account) from the Hub.
   const openAuth = useCallback(() => setRoute({ screen: 'auth' }), []);
+  const openLeaderboards = useCallback(() => setRoute({ screen: 'leaderboard' }), []);
 
   // After a successful sign in / sign up: record the session and return home.
   // The guest->account progress merge (Requirement 20.6) runs in accountSync on
@@ -224,6 +227,10 @@ export default function App() {
         <AuthScreen onAuthed={onAuthed} onCancel={goHub} />
       )}
 
+      {route.screen === 'leaderboard' && (
+        <LeaderboardScreen onHome={goHub} />
+      )}
+
       {route.screen === 'hub' && (
         <Hub
           key={`hub-${refreshKey}`}
@@ -232,6 +239,7 @@ export default function App() {
           session={session}
           onSignIn={openAuth}
           onSignOut={handleSignOut}
+          onOpenLeaderboards={openLeaderboards}
         />
       )}
 
