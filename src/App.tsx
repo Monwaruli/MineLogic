@@ -110,7 +110,14 @@ export default function App() {
   // simply never submit (their win is still saved locally).
   const submitWin = useCallback(
     async (won: WonGame): Promise<SubmitResult | null> => {
-      if (!session || !isSupabaseConfigured()) return null;
+      // Diagnostic (Req 19.6): instead of silently returning null, report WHY
+      // a win was not submitted so the End_Summary can show a precise reason.
+      if (!isSupabaseConfigured()) {
+        return { ok: false, check: 'unknown_difficulty', message: 'Leaderboards are offline (backend not configured in this build).' } as SubmitResult;
+      }
+      if (!session) {
+        return { ok: false, check: 'not_authenticated', message: 'You are not signed in, so this win was not submitted. Sign in and win again to enter the leaderboard.' } as SubmitResult;
+      }
       try {
         const client = getSupabaseClient();
         // Look up the Account's Display_Name for the denormalized entry.
