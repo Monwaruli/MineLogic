@@ -58,7 +58,7 @@ export interface GameScreenProps {
    * submission needs (Requirement 19). The caller (App) decides whether to
    * submit (only when signed in); GameScreen stays auth-agnostic.
    */
-  onWin?: (won: WonGame) => void;
+  onWin?: (won: WonGame) => Promise<import('../storage/leaderboardService').SubmitResult | null>;
 }
 
 /** The payload reported when a Timed_Game is won, for a leaderboard submit. */
@@ -94,6 +94,8 @@ export default function GameScreen({
   const [state, setState] = useState<GameState | null>(null);
   const [metrics, setMetrics] = useState<GameMetrics | null>(null);
   const savedRef = useRef(false);
+  const [leaderboardStatus, setLeaderboardStatus] =
+    useState<import('../storage/leaderboardService').SubmitResult | null>(null);
 
   // --- 1. Generate the board (unless one was supplied) ---
   useEffect(() => {
@@ -176,7 +178,7 @@ export default function GameScreen({
         // (Requirement 19). Elapsed time is the frozen end-of-game clock.
         if (state.status === 'won' && onWin) {
           const b = generated.board;
-          onWin({
+          void onWin({
             resultId: record.id,
             difficulty: difficulty.name,
             width: b.width,
@@ -186,7 +188,7 @@ export default function GameScreen({
             threeBv: m.threeBV,
             logicalMoveRate: m.logicalMoveRate,
             chordingEfficiency: m.chordingEfficiency,
-          });
+          }).then((res) => { if (res) setLeaderboardStatus(res); });
         }
       }
     }, 0);
@@ -308,6 +310,7 @@ export default function GameScreen({
           elapsedMs={elapsedMs(startedAt, stoppedAt, now())}
           onPlayAgain={onPlayAgain}
           onHome={onHome}
+          leaderboardStatus={leaderboardStatus}
         />
       )}
     </div>

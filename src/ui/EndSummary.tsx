@@ -8,6 +8,7 @@
  */
 
 import type { GameMetrics } from '../engine/metrics';
+import type { SubmitResult } from '../storage/leaderboardService';
 import { formatElapsed } from './useGameClock';
 
 export interface EndSummaryProps {
@@ -17,6 +18,12 @@ export interface EndSummaryProps {
   /** Restart / back-to-home callbacks. */
   onPlayAgain: () => void;
   onHome: () => void;
+  /**
+   * The leaderboard submission outcome for a won Timed_Game (Requirement 19.6).
+   * undefined/null means nothing was submitted (a loss, a Guest, or still in
+   * flight); a result shows success or the named failed check with guidance.
+   */
+  leaderboardStatus?: SubmitResult | null;
 }
 
 /** Human-readable outcome label. */
@@ -36,6 +43,7 @@ export default function EndSummary({
   elapsedMs,
   onPlayAgain,
   onHome,
+  leaderboardStatus,
 }: EndSummaryProps) {
   const lmr =
     metrics.logicalMoveRate === null ? 'n/a' : `${metrics.logicalMoveRate.toFixed(1)}%`;
@@ -50,6 +58,23 @@ export default function EndSummary({
       className="flex flex-col gap-5 bg-slate-800 rounded-lg p-6 max-w-md w-full"
     >
       <h2 className="text-2xl font-bold">{outcomeLabel(metrics.outcome)}</h2>
+
+      {leaderboardStatus && (
+        <div
+          role="status"
+          aria-live="polite"
+          data-testid="leaderboard-status"
+          className={
+            leaderboardStatus.ok
+              ? 'rounded-md bg-emerald-900/50 border border-emerald-600 px-4 py-2 text-sm text-emerald-200'
+              : 'rounded-md bg-amber-900/40 border border-amber-600 px-4 py-2 text-sm text-amber-200'
+          }
+        >
+          {leaderboardStatus.ok
+            ? 'Added to the leaderboard!'
+            : leaderboardStatus.message}
+        </div>
+      )}
 
       <dl className="flex flex-col gap-4">
         <div>

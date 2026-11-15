@@ -32,7 +32,7 @@ import PracticeScreen from './ui/PracticeScreen';
 import StudyModule from './study/StudyModule';
 import AuthScreen from './ui/AuthScreen';
 import LeaderboardScreen from './ui/LeaderboardScreen';
-import { submitResult } from './storage/leaderboardService';
+import { submitResult, type SubmitResult } from './storage/leaderboardService';
 import { getSupabaseClient, isSupabaseConfigured } from './storage/supabaseClient';
 import type { WonGame } from './ui/GameScreen';
 import { getSession, signOut as signOutSvc, type AuthSession } from './storage/authService';
@@ -108,9 +108,9 @@ export default function App() {
   // service enforces the practice gate (19.4) and all plausibility checks
   // (19.7, 19.8); we fire-and-forget and do not block the End_Summary. Guests
   // simply never submit (their win is still saved locally).
-  const submitWin = useCallback((won: WonGame) => {
-    if (!session || !isSupabaseConfigured()) return;
-    void (async () => {
+  const submitWin = useCallback(
+    async (won: WonGame): Promise<SubmitResult | null> => {
+      if (!session || !isSupabaseConfigured()) return null;
       try {
         const client = getSupabaseClient();
         // Look up the Account's Display_Name for the denormalized entry.
@@ -119,7 +119,7 @@ export default function App() {
         })
           .from('profiles').select('display_name').eq('id', session.userId).single();
         const displayName = data?.display_name ?? 'Player';
-        await submitResult({
+        return await submitResult({
           resultId: won.resultId,
           difficulty: won.difficulty as 'Beginner' | 'Intermediate' | 'Expert',
           displayName,
@@ -131,11 +131,12 @@ export default function App() {
           logicalMoveRate: won.logicalMoveRate,
           chordingEfficiency: won.chordingEfficiency,
         });
-      } catch {
-        // Swallow: a failed submission must never break the game summary.
+      } catch (e) {
+        return { ok: false, check: 'unknown_difficulty', message: e instanceof Error ? e.message : 'Submission failed.' } as SubmitResult;
       }
-    })();
-  }, [session]);
+    },
+    [session],
+  );
 
   const goHub = useCallback(() => {
     setRefreshKey((k) => k + 1);
