@@ -38,24 +38,11 @@ async function flush() {
  * Assumes it is called from the initial skill-check screen.
  */
 async function reachIntermediate() {
-  // Skill check -> Beginner lessons.
+  // The learning phase is now Intermediate-focused, so the Intermediate block
+  // is the FIRST block: clicking past the skill check lands on it directly.
   act(() => {
     fireEvent.click(screen.getByTestId('study-skillcheck-continue'));
   });
-  // Walk the Beginner lessons via the Continue control until the checkpoint.
-  for (let i = 0; i < 8 && screen.queryByTestId('study-lessons-continue'); i++) {
-    act(() => {
-      fireEvent.click(screen.getByTestId('study-lessons-continue'));
-    });
-    if (!screen.queryByTestId('study-block-lessons')) break;
-  }
-  // Beginner checkpoint -> practice -> next block.
-  if (screen.queryByTestId('study-checkpoint-continue')) {
-    act(() => fireEvent.click(screen.getByTestId('study-checkpoint-continue')));
-  }
-  if (screen.queryByTestId('study-practice-continue')) {
-    act(() => fireEvent.click(screen.getByTestId('study-practice-continue')));
-  }
   await flush();
 }
 
@@ -124,20 +111,20 @@ describe('StudyLearningPhase group assignment + video gate (Requirement 23)', ()
     expect(screen.queryByTestId('study-video-wrap')).toBeNull();
   });
 
-  it('shows the Beginner Video_Panel for both groups (23.8)', () => {
-    const { services } = fakeServices('Group_B');
+  it('starts the learning phase on the Intermediate block (short study)', () => {
+    const { services } = fakeServices('Group_A');
     render(
       <StudyLearningPhase
-        participantId="p-beg"
+        participantId="p-first"
         includesExpert={false}
         services={services}
         onComplete={() => {}}
       />,
     );
     act(() => fireEvent.click(screen.getByTestId('study-skillcheck-continue')));
-    // In the Beginner block the video wrap is present regardless of group.
-    expect(screen.getByTestId('study-block-tier').textContent).toMatch(/Beginner/);
-    expect(screen.queryByTestId('study-video-wrap')).not.toBeNull();
+    // The first (and only) learning block is Intermediate, where the '1-2-1'
+    // wall is taught; Beginner is no longer a separate learning block.
+    expect(screen.getByTestId('study-block-tier').textContent).toMatch(/Intermediate/);
   });
 
   it('keeps an existing group on resume without reassigning (23.5)', async () => {

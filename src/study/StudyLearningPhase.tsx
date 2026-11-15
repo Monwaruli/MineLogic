@@ -38,11 +38,17 @@ import PracticeScreen from '../ui/PracticeScreen';
 import VideoPanel from '../ui/VideoPanel';
 import { assignGroup as assignGroupRpc, type StudyGroup } from './studyService';
 
-/** The ordered learning blocks (23.1). Expert is included only when configured. */
+/**
+ * The ordered learning blocks. For the SHORT study we focus the learning
+ * phase on the Intermediate tier (the '1-2-1' wall is where casual players
+ * actually hit the wall, per the proposal), which keeps the session to
+ * ~10-15 minutes and reduces participant drop-off. The pre/post tests still
+ * cover Beginner + Intermediate, so improvement is measured on both, but the
+ * learning intervention concentrates on Intermediate. Expert is appended only
+ * when a Study_Config opts in (unchanged).
+ */
 function blockTiers(includesExpert: boolean): Tier[] {
-  return includesExpert
-    ? ['Beginner', 'Intermediate', 'Expert']
-    : ['Beginner', 'Intermediate'];
+  return includesExpert ? ['Intermediate', 'Expert'] : ['Intermediate'];
 }
 
 /** Whether the Video_Panel is shown for a Participant in a given block (23.6-23.8). */
