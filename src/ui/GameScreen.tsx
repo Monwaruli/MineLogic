@@ -53,6 +53,26 @@ export interface GameScreenProps {
    * hand-built or fixed-seed board to stay fast and deterministic.
    */
   presetBoard?: GeneratedBoard;
+  /**
+   * Called once when a Timed_Game is WON, with everything a leaderboard
+   * submission needs (Requirement 19). The caller (App) decides whether to
+   * submit (only when signed in); GameScreen stays auth-agnostic.
+   */
+  onWin?: (won: WonGame) => void;
+}
+
+/** The payload reported when a Timed_Game is won, for a leaderboard submit. */
+export interface WonGame {
+  /** Stable id of the saved game result (the game_results id). */
+  resultId: string;
+  difficulty: string;
+  width: number;
+  height: number;
+  mines: number;
+  timeMs: number;
+  threeBv: number;
+  logicalMoveRate: number | null;
+  chordingEfficiency: number | null;
 }
 
 /** The screen's phase. */
@@ -67,6 +87,7 @@ export default function GameScreen({
   now = Date.now,
   storage,
   presetBoard,
+  onWin,
 }: GameScreenProps) {
   const [generated, setGenerated] = useState<GeneratedBoard | null>(presetBoard ?? null);
   const [genError, setGenError] = useState<string | null>(null);
@@ -150,13 +171,30 @@ export default function GameScreen({
           finishedAt: now(),
         };
         saveResult(record, storage);
+
+        // On a WIN, report it so the caller can submit to the leaderboard
+        // (Requirement 19). Elapsed time is the frozen end-of-game clock.
+        if (state.status === 'won' && onWin) {
+          const b = generated.board;
+          onWin({
+            resultId: record.id,
+            difficulty: difficulty.name,
+            width: b.width,
+            height: b.height,
+            mines: b.mines.length,
+            timeMs: elapsedMs(startedAt, stoppedAt, now()),
+            threeBv: m.threeBV,
+            logicalMoveRate: m.logicalMoveRate,
+            chordingEfficiency: m.chordingEfficiency,
+          });
+        }
       }
     }, 0);
     return () => {
       cancelled = true;
       clearTimeout(handle);
     };
-  }, [state, generated, metrics, difficulty.name, now, storage]);
+  }, [state, generated, metrics, difficulty.name, now, storage, onWin, startedAt, stoppedAt]);
 
   const handleAction = useCallback(
     (action: Action) => {

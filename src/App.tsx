@@ -31,6 +31,9 @@ import GameScreen from './ui/GameScreen';
 import PracticeScreen from './ui/PracticeScreen';
 import StudyModule from './study/StudyModule';
 import AuthScreen from './ui/AuthScreen';
+import { submitResult } from './storage/leaderboardService';
+import { getSupabaseClient, isSupabaseConfigured } from './storage/supabaseClient';
+import type { WonGame } from './ui/GameScreen';
 import { getSession, signOut as signOutSvc, type AuthSession } from './storage/authService';
 import { currentStudyCode } from './study/studyLink';
 
@@ -96,6 +99,40 @@ export default function App() {
   const handleSignOut = useCallback(() => {
     void signOutSvc().finally(() => setSession(null));
   }, []);
+
+  // On a won Timed_Game, submit to the leaderboard — but only when signed in
+  // (leaderboard entries are per-Account) and the Backend is configured. The
+  // service enforces the practice gate (19.4) and all plausibility checks
+  // (19.7, 19.8); we fire-and-forget and do not block the End_Summary. Guests
+  // simply never submit (their win is still saved locally).
+  const submitWin = useCallback((won: WonGame) => {
+    if (!session || !isSupabaseConfigured()) return;
+    void (async () => {
+      try {
+        const client = getSupabaseClient();
+        // Look up the Account's Display_Name for the denormalized entry.
+        const { data } = await (client as unknown as {
+          from: (t: string) => { select: (c: string) => { eq: (k: string, v: string) => { single: () => Promise<{ data: { display_name?: string } | null }> } } };
+        })
+          .from('profiles').select('display_name').eq('id', session.userId).single();
+        const displayName = data?.display_name ?? 'Player';
+        await submitResult({
+          resultId: won.resultId,
+          difficulty: won.difficulty as 'Beginner' | 'Intermediate' | 'Expert',
+          displayName,
+          width: won.width,
+          height: won.height,
+          mines: won.mines,
+          timeMs: won.timeMs,
+          threeBv: won.threeBv,
+          logicalMoveRate: won.logicalMoveRate,
+          chordingEfficiency: won.chordingEfficiency,
+        });
+      } catch {
+        // Swallow: a failed submission must never break the game summary.
+      }
+    })();
+  }, [session]);
 
   const goHub = useCallback(() => {
     setRefreshKey((k) => k + 1);
@@ -230,6 +267,7 @@ export default function App() {
           onHome={goHub}
           onPlayAgain={playAgain}
           onRestart={restartBoard}
+          onWin={submitWin}
         />
       )}
     </main>
