@@ -62,9 +62,11 @@ export type VideoSource =
  *   },
  */
 export const VIDEO_SOURCES: Record<Tier, VideoSource | null> = {
-  Beginner: null,
-  Intermediate: null,
-  Expert: null,
+  // Walkthrough clips recorded by tools/demo/record-clips.mjs into
+  // public/videos/, served by Vite at /videos/<tier>.webm (Requirement 12.1).
+  Beginner: { kind: 'file', url: import.meta.env.BASE_URL + 'videos/beginner.webm' },
+  Intermediate: { kind: 'file', url: import.meta.env.BASE_URL + 'videos/intermediate.webm' },
+  Expert: { kind: 'file', url: import.meta.env.BASE_URL + 'videos/expert.webm' },
 };
 
 /**

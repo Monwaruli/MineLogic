@@ -16,10 +16,15 @@ describe('VideoPanel (Requirement 12)', () => {
     expect(screen.queryByTestId('video-youtube')).toBeNull();
   });
 
-  it('uses the config placeholder by default (every tier starts unset)', () => {
-    // With no explicit source, the default config has every tier null.
+  it('uses the configured per-tier file source by default (12.1)', () => {
+    // Every tier now has a walkthrough clip wired in src/content/videos.ts, so
+    // the default (no explicit source) renders the native file player, not the
+    // placeholder. The placeholder branch is still covered by the source={null}
+    // test above.
     render(<VideoPanel tier="Expert" />);
-    expect(screen.getByTestId('video-placeholder')).toBeTruthy();
+    const video = screen.getByTestId('video-file') as HTMLVideoElement;
+    expect(video.tagName.toLowerCase()).toBe('video');
+    expect(video.querySelector('source')?.getAttribute('src') || '').toContain('videos/expert.webm');
   });
 
   it('plays a direct file source with native controls (12.1, 12.4)', () => {
