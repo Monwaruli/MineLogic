@@ -153,11 +153,22 @@ async function recordTier(browser, tier) {
   const context = await browser.newContext({
     viewport: { width: 1100, height: 850 },
     recordVideo: { dir: CLIPS_DIR, size: { width: 1100, height: 850 } },
+    colorScheme: 'dark',
+  });
+  // Paint the page's base background in the app's slate-900 BEFORE React mounts,
+  // so the clip never opens on a white flash during initial load.
+  await context.addInitScript(() => {
+    const style = document.createElement('style');
+    style.textContent = 'html,body{background:#0f172a !important;}';
+    document.documentElement.appendChild(style);
   });
   const page = await context.newPage();
   console.log(`[${tier}] opening`);
-  await page.goto(SITE, { waitUntil: 'domcontentloaded' });
-  await sleep(PACE.read);
+  await page.goto(SITE, { waitUntil: 'networkidle' });
+  // Wait for the dark app shell to actually render, then settle, so the opening
+  // frames show the rendered UI rather than a blank/white page.
+  await page.waitForSelector('main', { timeout: 15000 }).catch(() => {});
+  await sleep(2500);
   await skipOnboardingIfPresent(page);
 
   // --- Tutorial: open the tier's Tutorial step, walk the Learn_Steps. --------
