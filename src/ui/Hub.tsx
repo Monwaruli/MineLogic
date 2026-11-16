@@ -136,6 +136,18 @@ export default function Hub({
 
   const rec = state.recommendation;
 
+  // The dev reset tool is hidden by default; it only appears in local dev or
+  // when the URL carries ?dev=1, so participants and graders never see it but
+  // a tester can still reset local progress. (Kept out of the production UI.)
+  const devMode = (() => {
+    try {
+      if (import.meta.env?.DEV) return true;
+      return new URLSearchParams(window.location.search).get('dev') === '1';
+    } catch {
+      return false;
+    }
+  })();
+
   return (
     <section
       aria-label="MineLogic hub"
@@ -196,16 +208,18 @@ export default function Hub({
         >
           Leaderboards
         </button>
-        {/* DEV ONLY: reset local progress for testing. REMOVE for production. */}
-        <button
-          type="button"
-          onClick={resetProgressDev}
-          data-testid="dev-reset-progress"
-          title="Developer tool: clears all saved progress on this browser"
-          className="underline text-rose-400 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-400 rounded px-1"
-        >
-          Reset progress (dev)
-        </button>
+        {/* DEV ONLY: reset local progress. Hidden unless ?dev=1 or local dev. */}
+        {devMode && (
+          <button
+            type="button"
+            onClick={resetProgressDev}
+            data-testid="dev-reset-progress"
+            title="Developer tool: clears all saved progress on this browser"
+            className="underline text-rose-400 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-400 rounded px-1"
+          >
+            Reset progress (dev)
+          </button>
+        )}
       </div>
 
       {/* Recommendation (Requirement 17.6). */}
